@@ -1,0 +1,60 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "MARGEN",
+  "version": "1.12.2",
+  "identifier": "com.margen.escritorio",
+  "build": {
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "MARGEN — Estudio de escritura",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600,
+        "backgroundColor": "#f2eee7",
+        "maximized": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "connect-src": "ipc: http://ipc.localhost",
+        "img-src": "'self' blob: data:",
+        "font-src": "'self' data:",
+        "style-src": "'self' 'unsafe-inline'",
+        "script-src": "'self'",
+        "object-src": "'none'",
+        "frame-src": "'none'"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis"
+    ],
+    "icon": [
+      "icons/icon.ico"
+    ],
+    "shortDescription": "Estudio de escritura offline",
+    "windows": {
+      "nsis": {
+        "displayLanguageSelector": false
+      }
+    },
+    "resources": [
+      "resources/lexicons/english.sqlite3",
+      "resources/lexicons/spanish-synonyms.sqlite3",
+      "resources/lexicons/spanish-definitions-CC-BY-SA.sqlite3",
+      "resources/lexicons/SOURCE_MANIFEST.json",
+      "resources/LEGAL_LEXICONS.txt",
+      "resources/licenses/*"
+    ]
+  }
+}

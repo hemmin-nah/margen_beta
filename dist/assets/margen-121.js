@@ -393,3 +393,81 @@ render=function(){
   m1211R4SyncPanelTop();m1211R4BindEditHistory();
   return result;
 };
+
+
+/* ===== 1.12.1 R5 · historial estructural de pizarra + cronología simplificada ===== */
+function m1211R5BlurBoardEditor(){
+  const active=document.activeElement;
+  if(active?.closest?.('#board-items')&&active.matches?.('input,textarea,[contenteditable="true"]'))active.blur();
+}
+
+/* Mover/redimensionar es una operación estructural: siempre nace con un snapshot
+   propio y saca el foco de los campos de texto para que Ctrl+Z no termine en el
+   historial nativo del input después de soltar el objeto. */
+const m1211R5PrevStartItemDrag=startItemDrag;
+startItemDrag=function(event,item,node,kind){
+  if(state.view==='boards'&&activeBoard()?.boardType==='free'){
+    m1211R5BlurBoardEditor();
+    pushBoardUndo();
+  }
+  return m1211R5PrevStartItemDrag(event,item,node,kind);
+};
+
+const m1211R5PrevDeleteSelected=deleteSelected;
+deleteSelected=function(){
+  if(state.view==='boards'&&activeBoard()?.boardType==='free')m1211R5BlurBoardEditor();
+  return m1211R5PrevDeleteSelected();
+};
+
+/* Los tiradores nuevos no pasan por startItemDrag; aseguramos foco e historial
+   antes de cualquier resize. La deduplicación de pushBoardUndo evita snapshots
+   repetidos aunque una capa anterior ya hubiese guardado el mismo estado. */
+function m1211R5BindStructuralBoardHistory(){
+  if(state.view!=='boards'||activeBoard()?.boardType!=='free')return;
+  document.querySelectorAll('#board-items .m1211-resize,[data-m1211-stamp-hit]').forEach(handle=>{
+    if(handle.dataset.m1211R5HistoryBound)return;
+    handle.dataset.m1211R5HistoryBound='1';
+    handle.addEventListener('pointerdown',()=>{m1211R5BlurBoardEditor();pushBoardUndo()},true);
+  });
+}
+
+const m1211R5PrevRenderBoardElements=renderBoardElements;
+renderBoardElements=function(){const result=m1211R5PrevRenderBoardElements();m1211R5BindStructuralBoardHistory();return result};
+
+/* La línea temporal deja de mostrar índice y óvalo: cada acontecimiento conserva
+   únicamente su tallo vertical hacia la línea principal. */
+const m1211R5PrevTimePoint=m131TimePoint;
+m131TimePoint=function(event,index){
+  return m1211R5PrevTimePoint(event,index)
+    .replace(/<span class="m131-time-dot"><\/span>/,'')
+    .replace(/<span class="m131-time-order"[^>]*>[\s\S]*?<\/span>/,'');
+};
+
+/* El color se escribe siempre en el objeto del acontecimiento y, al cerrar el
+   selector, se fuerza el guardado del libro. Así no depende sólo del repaint. */
+const m1211R5PrevBindTimeline=m1211BindTimeline;
+m1211BindTimeline=function(){
+  m1211R5PrevBindTimeline();
+  if(state.view!=='chronologies')return;
+  const t=activeChronology(),picker=document.querySelector('#m131-time-editor [data-m1211-event-color]');
+  if(!t||!picker)return;
+  let undoCaptured=false;
+  const current=()=>t.events.find(x=>x.id===m131TimelineSelectedId)||m131CurrentEvent();
+  const capture=()=>{if(!undoCaptured){m1211PushChronUndo(t);undoCaptured=true}};
+  const apply=()=>{
+    const event=current();if(!event)return;
+    const value=/^#[0-9a-fA-F]{6}$/.test(picker.value||'')?picker.value.toLowerCase():m1211Palette[0];
+    event.color=value;picker.value=value;m1211ApplyTimelineColor(event.id,value);changed();
+  };
+  picker.onpointerdown=capture;
+  picker.onfocus=capture;
+  picker.oninput=()=>{capture();apply()};
+  picker.onchange=()=>{capture();apply();undoCaptured=false;try{const out=save?.();out?.catch?.(()=>{})}catch(_e){}};
+};
+
+const m1211R5PrevRender=render;
+render=function(){
+  const result=m1211R5PrevRender();
+  m1211R5BindStructuralBoardHistory();
+  return result;
+};

@@ -71,6 +71,6 @@ for required in ['DB_SCHEMA_VERSION','schema_migrations','desktop_startup_health
     assert required in rust,required
 assert 'texto de capítulos' not in rust.lower() or 'no incluye el texto de capítulos' in rust.lower()
 conf=json.loads((root/'src-tauri/tauri.conf.json').read_text('utf8'))
-assert conf['identifier']=='com.margen.escritorio' and conf['version']=='1.12.0'
+assert conf['identifier']=='com.margen.escritorio' and conf['version']=='1.12.1'
 assert 'margen-111.js' in (root/'herramientas_frontend.py').read_text('utf8')
 print('PASS 1.11: versión/datos, copias, diagnóstico, migración formal y cierre inesperado')

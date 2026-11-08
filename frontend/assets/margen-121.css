@@ -147,3 +147,15 @@
   box-shadow:0 0 0 2px color-mix(in srgb,var(--m1211-event) 20%,transparent)!important;
 }
 .m131-time-point .m131-time-card small{color:color-mix(in srgb,var(--m1211-event) 72%,var(--ink))!important}
+
+
+/* ===== 1.12.1 R5 · cronología limpia ===== */
+/* Sin números ni óvalos: sólo línea principal + tallo vertical de cada evento. */
+.m131-time-point .m131-time-dot,
+.m131-time-point .m131-time-order{display:none!important}
+.m131-time-point:before{
+  width:3px!important;
+  border-radius:3px!important;
+  background:var(--m1211-event)!important;
+  box-shadow:none!important;
+}

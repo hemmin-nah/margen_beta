@@ -64,3 +64,10 @@
 - Cronología: tarjeta, tallo y punto muestran el color; la línea general permanece neutra para evitar mezclas visuales entre acontecimientos.
 - Cronología: se refuerza el arrastre manual mediante eventos de puntero a nivel de documento.
 - El workflow de Windows permanece byte por byte idéntico al de la Revisión 3 que ya compila correctamente.
+
+
+## Beta 1.12.1 · Revisión 5
+- Pizarra: historial estructural reforzado para mover, redimensionar y borrar elementos; el foco de edición ya no secuestra Ctrl+Z tras una operación de lienzo.
+- Cronología: eliminados números y óvalos de la línea; quedan la línea principal y los tallos de cada acontecimiento.
+- Cronología: el color se persiste en el acontecimiento y fuerza guardado al confirmar el selector de color.
+- Build de Windows: sin cambios respecto a la revisión que ya compila correctamente.

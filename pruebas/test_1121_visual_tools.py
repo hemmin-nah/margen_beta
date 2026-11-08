@@ -98,6 +98,21 @@ with sync_playwright() as pw:
  assert page.evaluate("!activeBoard().elements.some(x=>x.id==='n1'||x.id==='n2')")
  page.keyboard.press('Control+z');page.wait_for_timeout(50)
  assert page.evaluate("activeBoard().elements.some(x=>x.id==='n1')&&activeBoard().elements.some(x=>x.id==='n2')")
+ # Movimiento real de una nota debe entrar en el historial estructural.
+ page.evaluate("boardSelectedIds.clear();selectedElement=null;m1211SyncBoardSelection()")
+ oldpos=page.evaluate("(()=>{const n=activeBoard().elements.find(x=>x.id==='n1');return [n.x,n.y]})()")
+ n1=page.locator('.board-item[data-eid="n1"]');nb=n1.bounding_box()
+ page.mouse.move(nb['x']+nb['width']*0.55,nb['y']+nb['height']*0.72);page.mouse.down();page.mouse.move(nb['x']+nb['width']*0.55+55,nb['y']+nb['height']*0.72+28,steps=8);page.mouse.up();page.wait_for_timeout(45)
+ moved=page.evaluate("(()=>{const n=activeBoard().elements.find(x=>x.id==='n1');return [n.x,n.y]})()")
+ assert moved!=oldpos,(oldpos,moved)
+ page.keyboard.press('Control+z');page.wait_for_timeout(60)
+ restored=page.evaluate("(()=>{const n=activeBoard().elements.find(x=>x.id==='n1');return [n.x,n.y]})()")
+ assert restored==oldpos,(oldpos,moved,restored)
+ # Y borrar después de una operación estructural también debe poder recuperarse.
+ handle=page.locator('.board-item[data-eid="n1"] .item-handle');hb=handle.bounding_box();page.mouse.move(hb['x']+4,hb['y']+4);page.mouse.down();page.mouse.up();page.wait_for_timeout(20);page.keyboard.press('Delete');page.wait_for_timeout(40)
+ assert page.evaluate("!activeBoard().elements.some(x=>x.id==='n1')")
+ page.keyboard.press('Control+z');page.wait_for_timeout(60)
+ assert page.evaluate("activeBoard().elements.some(x=>x.id==='n1')")
  # Marco arrastrando sobre el fondo también selecciona ambas notas.
  page.evaluate("boardSelectedIds.clear();selectedElement=null;m1211SyncBoardSelection()")
  wr=page.locator('#board-world').bounding_box();vp=page.locator('#board-viewport').bounding_box()
@@ -138,6 +153,8 @@ with sync_playwright() as pw:
  # Cronología: color visible + controles bajo la línea + arrastre por puntero + Ctrl+Z.
  page.evaluate("()=>{state.view='chronologies';state.activeChronologyId='t1';m131TimelineSelectedChron='t1';m131TimelineSelectedId='e1';render()}");page.wait_for_timeout(100)
  assert page.locator('[data-m1211-event-color]').count()==1
+ assert page.locator('.m131-time-dot').count()==0
+ assert page.locator('.m131-time-order').count()==0
  row=page.locator('[data-m1211-timeline-insert-row]'); assert row.count()==1
  assert row.locator('[data-m1211-insert="before"]').count()==1 and row.locator('[data-m1211-insert="after"]').count()==1
  assert page.locator('#m131-time-editor [data-m1211-insert]').count()==0

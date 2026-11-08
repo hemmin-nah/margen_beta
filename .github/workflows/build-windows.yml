@@ -1,0 +1,91 @@
+name: Compilar MARGEN para Windows
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows-x64:
+    runs-on: windows-latest
+
+    steps:
+      - name: Obtener el proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Preparar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Comprobar transformador léxico sin red
+        run: python herramientas_lexicas.py --test
+
+      - name: Descargar y preparar recursos léxicos con licencias
+        run: python herramientas_lexicas.py --build
+
+      - name: Verificar que los diccionarios reales existen y son válidos
+        run: python herramientas_lexicas.py --verify
+
+      # Igual que en las builds anteriores que funcionaban: la CLI la decide package.json.
+      - name: Instalar dependencias y CLI Tauri
+        run: npm install
+
+      - name: Reconstruir frontend desde las fuentes
+        run: python herramientas_frontend.py
+
+      - name: Verificar código
+        run: npm run check:frontend
+
+      - name: Verificar beta 1.12.1 sin navegador
+        run: python pruebas/test_1121_release_static.py
+
+      - name: Pruebas Rust
+        run: cargo test --manifest-path src-tauri/Cargo.toml
+
+      # NSIS se descarga durante el bundle. Si GitHub devuelve un 504 temporal,
+      # repetimos el mismo build sin cambiar versiones ni instalar otra CLI.
+      - name: Compilar instalador NSIS
+        shell: pwsh
+        run: |
+          $max = 3
+          for ($i = 1; $i -le $max; $i++) {
+            Write-Host "Intento $i de $max"
+            npm run tauri build -- --bundles nsis
+            if ($LASTEXITCODE -eq 0) { exit 0 }
+            if ($i -eq $max) { exit $LASTEXITCODE }
+            Start-Sleep -Seconds (15 * $i)
+          }
+
+      - name: Publicar fuentes y licencias comprobadas
+        uses: actions/upload-artifact@v4
+        with:
+          name: MARGEN-1.12.1-Fuentes-y-Licencias
+          path: |
+            src-tauri/resources/LEGAL_LEXICONS.txt
+            src-tauri/resources/lexicons/SOURCE_MANIFEST.json
+            src-tauri/resources/licenses/*
+          if-no-files-found: error
+
+      - name: Publicar instalador como artefacto privado del workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: MARGEN-1.12.1-Windows-x64
+          path: src-tauri/target/release/bundle/nsis/*-setup.exe
+          if-no-files-found: error
+
+      - name: Publicar ejecutable (sin instalador)
+        uses: actions/upload-artifact@v4
+        with:
+          name: MARGEN-1.12.1-Ejecutable-x64
+          path: src-tauri/target/release/margen-desktop.exe
+          if-no-files-found: error

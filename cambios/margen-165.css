@@ -1,0 +1,72 @@
+/* MARGEN Desktop 1.6.5: tipografía temática, alineación de fichas y desplazamiento */
+/* Los colores explícitos del DOCX permanecen EN LOS DATOS para exportación,
+   pero nunca se aplican a la lectura del manuscrito dentro del editor. */
+html[data-theme="light"]{--m165-prose-ink:#242421}
+html[data-theme="dark"]{--m165-prose-ink:#f2efe9}
+:is(.editor-text,#chapter-editor,.m142-reader-content,.m143-continuous-chapter,.m143-wide-editor,.m143-wide-writing,.m143-studio-editor,.m161-wide-content,.screenplay-editor) {color:var(--m165-prose-ink)!important}
+:is(.editor-text,#chapter-editor,.m142-reader-content,.m143-continuous-chapter,.m143-wide-editor,.m143-wide-writing,.m143-studio-editor,.m161-wide-content,.screenplay-editor) :where(*):not(input):not(textarea){color:var(--m165-prose-ink)!important;-webkit-text-fill-color:var(--m165-prose-ink)!important}
+/* También los colores de importación con atributos <font color=...>. */
+:is(.editor-text,#chapter-editor,.m142-reader-content,.m143-continuous-chapter,.m143-wide-editor,.m143-wide-writing,.m143-studio-editor) :where(font,[style*="color"]){color:var(--m165-prose-ink)!important}
+
+/* Seis tarjetas: dos filas de tres, y apartados completos debajo. */
+@media(min-width:1160px){
+ .char-page .char-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .char-page .m164-character-pair.m165-character-triple{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:1159px){
+ .char-page .m164-character-pair.m165-character-triple{grid-column:1/-1;grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:940px){
+ .char-page .m164-character-pair.m165-character-triple{grid-template-columns:1fr}
+}
+.char-page .m165-character-triple>.char-panel{grid-column:auto!important;min-width:0}
+.m165-evolution>summary{gap:9px!important}
+.m165-evolution>summary>svg:first-child{transform:none!important;flex:none}
+.m165-evolution>summary>span{flex:1}
+.m165-evolution>summary>small{margin-left:auto!important}
+.m165-evolution>summary>svg:last-child{margin-left:6px;transform:none!important}
+.m165-evolution[open]>summary>svg:last-child{transform:rotate(90deg)!important}
+
+/* Un único estilo de scroll para los paneles (WebView2 / Chromium). */
+:root{scrollbar-color:color-mix(in srgb,var(--accent-strong) 70%,var(--surface)) var(--surface2);scrollbar-width:thin}
+html,body,.sidebar-scroll,.main-scroll,.editor-area,.m131-time-scroll,.m142-reader-scroll,.m143-wide-writing,.m122-diagram-aside,.m142-search-results{scrollbar-color:color-mix(in srgb,var(--accent-strong) 75%,var(--surface)) var(--surface2)!important;scrollbar-width:thin}
+::-webkit-scrollbar{width:11px;height:11px}
+::-webkit-scrollbar-track{background:var(--surface2);border-radius:12px}
+::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--accent-strong) 65%,var(--surface));border:2px solid var(--surface2);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent-strong)}
+
+/* Volver a la vista anterior sin duplicar menús. */
+.m165-back{min-width:36px;justify-content:center;padding:0 8px!important}
+.m165-back svg{width:18px;height:18px}
+.m165-back:disabled{opacity:.28;cursor:default}
+
+/* Biblioteca sin Escritorio duplicado, con opciones discretas. */
+.m165-library-actions{display:flex;justify-content:flex-end;align-items:center;gap:9px;flex-wrap:wrap}
+.m165-library-tools{display:flex;justify-content:space-between;align-items:center;gap:16px;margin:12px 0 17px}
+.m165-library-search{border:1px solid var(--line);border-radius:10px;background:var(--surface);display:flex;align-items:center;gap:9px;padding:9px 13px;flex:1;max-width:540px;min-width:160px}
+.m165-library-search svg{color:var(--muted);width:17px;height:17px}
+.m165-library-search input{border:0;outline:none;width:100%;background:transparent;color:var(--ink);min-width:0}
+.m165-library-sort{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:9px}
+.m165-library-sort select{border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink);padding:9px 10px}
+.m165-library-review{border:1px solid var(--line);border-radius:11px;background:var(--surface);padding:12px 16px;margin:5px 0 18px}
+.m165-library-review summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;font-weight:650;font-size:13px}
+.m165-library-review summary::-webkit-details-marker{display:none}
+.m165-library-review summary svg{width:17px;height:17px;color:var(--accent-strong)}
+.m165-library-review summary span{flex:1}
+.m165-library-review summary strong{color:var(--muted);font-weight:500}
+.m165-library-review summary svg:last-child{transform:rotate(0deg);transition:transform .15s}
+.m165-library-review[open] summary svg:last-child{transform:rotate(90deg)}
+.m165-library-review-items{padding-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.m165-library-review-items p{color:var(--muted);margin:0}
+.project-card[hidden]{display:none!important}
+@media(max-width:700px){.m165-library-tools{flex-wrap:wrap}.m165-library-search{max-width:none;flex-basis:100%}}
+/* El título editable que ya existe es la cabecera de la cronología. */
+.chronologies .workspace-head:has(+ .main-scroll .m131-time-page) h1{display:none}
+/* La especificidad gana a estilos legados de párrafos del editor sin borrar formato. */
+html[data-theme] :is(#chapter-editor,.editor-text,.m142-reader-content,.m143-continuous-chapter,.m143-wide-editor,.m143-wide-writing,.m143-studio-editor,.m161-wide-content,.screenplay-editor) *{color:var(--m165-prose-ink)!important;-webkit-text-fill-color:var(--m165-prose-ink)!important}
+html[data-theme] body #app #workspace :is(#chapter-editor,.editor-text,.m142-reader-content,.m143-continuous-chapter,.m143-wide-editor,.m143-wide-writing,.m143-studio-editor,.m161-wide-content,.screenplay-editor) *{color:var(--m165-prose-ink)!important;-webkit-text-fill-color:var(--m165-prose-ink)!important}
+
+/* 1.6.5.1: Evolucion ocupa TODA la anchura, igual que las secciones vinculadas.
+   No depende del idioma ni del ordinal del panel en el DOM. */
+.char-page .char-grid > .char-panel.m165-evolution-panel{grid-column:1 / -1!important;width:100%;min-width:0}
+.char-page .char-grid > .char-panel.m165-evolution-panel > .m164-evolution{width:100%}

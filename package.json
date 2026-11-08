@@ -1,0 +1,14 @@
+{
+  "name": "margen-desktop",
+  "version": "1.12.1",
+  "private": true,
+  "description": "MARGEN · Estudio de escritura, edición Windows",
+  "scripts": {
+    "tauri": "tauri",
+    "build:frontend": "python herramientas_frontend.py",
+    "check:frontend": "node --check frontend/assets/margen.js && node --check frontend/assets/margen-170.js && node --check frontend/assets/margen-171.js && node --check frontend/assets/margen-172.js && node --check frontend/assets/margen-173.js && node --check frontend/assets/margen-180.js && node --check frontend/assets/margen-191.js && node --check frontend/assets/margen-110.js && node --check frontend/assets/margen-111.js && node --check frontend/assets/margen-112.js && node --check frontend/assets/margen-121.js"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
+  }
+}

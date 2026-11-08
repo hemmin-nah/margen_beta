@@ -1,0 +1,36 @@
+/* MARGEN Desktop 1.10.1 — pulido del editor integrado.
+ * - Los nombres de Consulta rápida pueden ocupar varias líneas: no se truncan.
+ * - La barra Editar/Lectura/Escritura amplia + Buscar + tipo de escritura
+ *   se alinea con el ancho real del editor cuando hay un panel lateral abierto.
+ */
+.m143-ref-list button{
+  white-space:normal;
+  overflow:visible;
+  text-overflow:clip;
+  overflow-wrap:anywhere;
+  line-height:1.35;
+  min-height:34px;
+  flex:none;
+}
+.m143-ref-list{
+  max-height:min(230px,34vh);
+  scrollbar-gutter:stable;
+}
+
+@media (min-width:1171px){
+  .workspace.m162-sheets-visible .workspace-head.m1431-manuscript-head.m163-editor-head>.m1431-mode-center{
+    width:min(790px,calc(100% + 46px - min(385px,36vw)));
+    max-width:calc(100% + 46px - min(385px,36vw));
+    margin-left:max(-23px,calc((100% - min(385px,36vw) - 790px) / 2));
+    margin-right:0;
+    justify-self:start!important;
+  }
+  .workspace.m161-side-open .workspace-head.m1431-manuscript-head.m163-editor-head>.m1431-mode-center,
+  .workspace.m161-search-open .workspace-head.m1431-manuscript-head.m163-editor-head>.m1431-mode-center{
+    width:min(790px,calc(100% + 46px - min(365px,36vw)));
+    max-width:calc(100% + 46px - min(365px,36vw));
+    margin-left:max(-23px,calc((100% - min(365px,36vw) - 790px) / 2));
+    margin-right:0;
+    justify-self:start!important;
+  }
+}

@@ -1,0 +1,8 @@
+/* MARGEN 1.12.2 */
+.m122-book-pin{left:10px;right:auto;top:10px;display:flex;gap:5px;align-items:center;z-index:4}
+.project-card.m122-book-pinned{outline:1px solid color-mix(in srgb,var(--accent) 46%,transparent)}
+.m122-outline-undo:disabled{opacity:.42;pointer-events:none}
+body.m122-outline-dragging{cursor:grabbing!important;user-select:none}
+body.m122-outline-dragging *{cursor:grabbing!important}
+.m13-scene.is-dragging{opacity:.55}
+.m122-trash-hint{margin:0 0 12px}

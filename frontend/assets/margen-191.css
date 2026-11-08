@@ -1,0 +1,41 @@
+/* MARGEN 1.9.1 · corrección acotada del panel lateral del exportador. */
+.m180-columns{
+  min-height:0;
+  overflow:hidden;
+  grid-template-rows:minmax(0,1fr);
+}
+.m180-controls{
+  min-height:0;
+  max-height:100%;
+  align-self:stretch;
+  box-sizing:border-box;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-gutter:stable;
+  overscroll-behavior:contain;
+  padding:17px 19px 34px;
+}
+.m180-preview{
+  min-height:0;
+  overflow:hidden;
+}
+.m180-chapter-head{margin-top:18px}
+.m180-chapters{max-height:138px}
+.m180-layout{margin-top:17px}
+.m180-fields{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.m190-four-margins{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 9px}
+.m180-dialog .m190-four-margins input{padding:8px 7px}
+@media(max-width:720px){
+  .m180-columns{
+    overflow:auto;
+    grid-template-rows:auto;
+  }
+  .m180-controls{
+    max-height:none;
+    height:auto;
+    overflow:visible;
+    padding-bottom:22px;
+  }
+  .m180-preview{overflow:visible}
+  .m180-chapters{max-height:176px}
+}

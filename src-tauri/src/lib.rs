@@ -1,4 +1,4 @@
-//! MARGEN 1.12.3 Beta final: backend local de escritorio.
+//! MARGEN 1.13.0 Beta final: backend local de escritorio.
 //! Persistencia SQLite incremental por libro, carga bajo demanda, recuperación transaccional y medios por SHA256.
 //! No expone acceso arbitrario al disco ni acepta rutas suministradas por la webview.
 mod lexicon;
@@ -547,7 +547,7 @@ fn garbage_collect_book_versions(db:&Connection)->MResult<()> {
     Ok(())
 }
 
-// --- Beta final 1.12.3: papelera de libros y ubicación segura de biblioteca. ---
+// --- Beta final 1.13.0: papelera de libros y ubicación segura de biblioteca. ---
 #[derive(Debug, Clone)]
 struct BookTrashRow {book_id:String,version_id:String,original_position:i64,deleted_at:String}
 #[derive(Serialize)]

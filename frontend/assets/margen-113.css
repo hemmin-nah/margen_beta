@@ -1,0 +1,18 @@
+/* MARGEN 1.13 · Pizarra avanzada + atajos */
+.board-world{width:20000px!important;height:14000px!important;border:0!important;box-shadow:none!important;background-color:var(--board-paper)}
+.board-world .m162-vector-strokes{width:20000px!important;height:14000px!important;overflow:visible;pointer-events:none!important}
+.board-world .m162-vector-strokes .m113-stroke-hit{stroke:rgba(0,0,0,.001);fill:transparent;pointer-events:stroke;cursor:move}
+.board-world .m162-vector-strokes .m113-stroke-hit.selected{stroke:color-mix(in srgb,var(--accent-strong) 55%,transparent);filter:drop-shadow(0 0 1px var(--accent-strong))}
+.board-world .m162-ruled-paper{width:20000px!important;height:14000px!important}
+.board-viewport.m113-space-pan,.board-viewport.m113-space-pan *{cursor:grabbing!important}
+.m113-shortcuts-trigger{width:100%;justify-content:flex-start;margin-bottom:7px}
+.m113-shortcuts{width:min(820px,94vw);max-width:none;max-height:84vh;overflow:auto}
+.m113-shortcuts-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}.m113-shortcuts-head h2{margin:3px 0 0}
+.m113-shortcuts-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px}.m113-shortcuts-grid section{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:15px}.m113-shortcuts-grid h3{font:600 13px/1.3 'Segoe UI',sans-serif;margin:0 0 10px;color:var(--ink)}
+.m113-shortcut-row{display:grid;grid-template-columns:minmax(78px,auto) 1fr;align-items:center;gap:10px;padding:7px 0;border-top:1px solid color-mix(in srgb,var(--line) 70%,transparent);font-size:12px}.m113-shortcut-row:first-of-type{border-top:0}.m113-shortcut-row kbd{display:inline-flex;justify-content:center;background:var(--surface);border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;padding:4px 7px;font:600 11px/1.2 ui-monospace,Consolas,monospace;white-space:nowrap}.m113-shortcut-row span{color:var(--muted)}
+@media(max-width:760px){.m113-shortcuts-grid{grid-template-columns:1fr}}
+
+.board-world.bg-ruled{background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 39px,var(--grid) 40px,var(--grid) 41px)!important;background-position:0 13px!important}
+.board-world .m162-ruled-paper{display:none!important}
+
+.board-viewport:not(.m113-select-mode) .m113-stroke-hit{pointer-events:none!important}

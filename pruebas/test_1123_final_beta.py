@@ -4,8 +4,8 @@ import json,re,hashlib
 root=Path(__file__).resolve().parents[1]
 read=lambda p:(root/p).read_text('utf8')
 pkg=json.loads(read('package.json'));conf=json.loads(read('src-tauri/tauri.conf.json'))
-assert pkg['version']=='1.12.3' and conf['version']=='1.12.3'
-index=read('frontend/index.html');assert 'margen-123.js' in index and 'margen-123.css' in index and '1.12.3' in index
+version=pkg['version'];assert conf['version']==version
+index=read('frontend/index.html');assert 'margen-123.js' in index and 'margen-123.css' in index and version in index
 js=read('frontend/assets/margen-123.js');css=read('frontend/assets/margen-123.css');backend=read('src-tauri/src/lib.rs')
 for token in ['desktop_list_book_trash','desktop_trash_book','desktop_restore_book','desktop_delete_trashed_book','desktop_empty_book_trash','desktop_library_info','desktop_choose_library_location','desktop_cleanup_previous_library','desktop_reset_library_location']:
     assert token in backend,token

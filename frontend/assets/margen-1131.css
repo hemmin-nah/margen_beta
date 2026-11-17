@@ -1,0 +1,13 @@
+/* MARGEN 1.13.1 · selector de exportación JSON */
+.m1131-export-modal{width:min(620px,calc(100vw - 36px));max-width:620px}
+.m1131-export-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.m1131-export-head h2{margin:.15rem 0 0}
+.m1131-export-intro{margin:10px 0 18px;color:var(--muted)}
+.m1131-export-options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.m1131-export-card{display:flex;flex-direction:column;gap:12px;padding:15px;border:1px solid var(--border);border-radius:14px;background:var(--surface2)}
+.m1131-export-card>div{display:flex;flex-direction:column;gap:4px}
+.m1131-export-card small,.m1131-export-note{color:var(--muted);line-height:1.45}
+.m1131-book-select{display:flex;flex-direction:column;gap:5px;font-size:.82rem;color:var(--muted)}
+.m1131-book-select select{width:100%;min-width:0}
+.m1131-export-note{font-size:.78rem;margin:14px 0 0}
+@media(max-width:640px){.m1131-export-options{grid-template-columns:1fr}}

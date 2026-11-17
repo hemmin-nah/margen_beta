@@ -1,4 +1,4 @@
-//! MARGEN 1.13.0 Beta final: backend local de escritorio.
+//! MARGEN 1.13.1 Beta: backend local de escritorio.
 //! Persistencia SQLite incremental por libro, carga bajo demanda, recuperación transaccional y medios por SHA256.
 //! No expone acceso arbitrario al disco ni acepta rutas suministradas por la webview.
 mod lexicon;
@@ -1231,12 +1231,37 @@ async fn desktop_export_diagnostics(app:tauri::AppHandle)->MResult<Option<String
     let text=diagnostic_text(&app)?;
     choose_and_export(app,format!("MARGEN-diagnostico-{}.txt",time()),"txt".into(),text.into_bytes()).await
 }
+fn export_stem(input:&str,fallback:&str)->String{
+    let stem:String=input.chars()
+        .filter(|c|!matches!(*c,'/'|'\\'|':'|'*'|'?'|'"'|'<'|'>'|'|')&&!c.is_control())
+        .take(80).collect();
+    let stem=stem.trim().trim_matches('.');
+    if stem.is_empty(){fallback.into()}else{stem.into()}
+}
+fn single_book_export_payload(book:Value)->MResult<Value>{
+    validate_book(&book)?;
+    Ok(json!({
+        "format":"MARGEN_BOOK",
+        "formatVersion":1,
+        "appVersion":MARGEN_VERSION,
+        "exportedAt":time(),
+        "book":book
+    }))
+}
 #[tauri::command]
 async fn desktop_export_backup(app:tauri::AppHandle,snapshot:Value,kind:String)->MResult<Option<String>>{
     validate_workspace(&snapshot)?;
     let kind=if kind=="conflict"{"conflicto"}else{"copia"};
     let bytes=serde_json::to_vec_pretty(&snapshot).map_err(error)?;
     choose_and_export(app,format!("MARGEN-{kind}-{}.json",time()),"json".into(),bytes).await
+}
+#[tauri::command]
+async fn desktop_export_book(app:tauri::AppHandle,book:Value)->MResult<Option<String>>{
+    let title=book.get("name").and_then(Value::as_str).unwrap_or("Libro");
+    let filename=format!("MARGEN-libro-{}.json",export_stem(title,"Libro"));
+    let payload=single_book_export_payload(book)?;
+    let bytes=serde_json::to_vec_pretty(&payload).map_err(error)?;
+    choose_and_export(app,filename,"json".into(),bytes).await
 }
 #[tauri::command]
 async fn desktop_export_document(app:tauri::AppHandle,filename:String,extension:String,data_base64:String)->MResult<Option<String>>{
@@ -1272,7 +1297,7 @@ pub fn run() {
             desktop_load_index,desktop_load_book,desktop_load_cover,desktop_load_records,desktop_load_recovery,desktop_save_records,desktop_save_incremental,
             desktop_list_book_trash,desktop_trash_book,desktop_restore_book,desktop_delete_trashed_book,desktop_empty_book_trash,
             desktop_library_info,desktop_choose_library_location,desktop_cleanup_previous_library,desktop_reset_library_location,
-            desktop_export_backup,desktop_export_document,desktop_export_diagnostics,desktop_startup_health,desktop_support_info,desktop_log_error,desktop_open_data_folder,
+            desktop_export_backup,desktop_export_book,desktop_export_document,desktop_export_diagnostics,desktop_startup_health,desktop_support_info,desktop_log_error,desktop_open_data_folder,
             lexicon::lexical_lookup
         ])
         .run(tauri::generate_context!())
@@ -1303,6 +1328,13 @@ mod tests {
         let other=write_export_new(&file,b"NEW").unwrap();assert_ne!(file,other);
         assert_eq!(fs::read(&file).unwrap(),b"OLD");assert_eq!(fs::read(other).unwrap(),b"NEW");
         fs::remove_dir_all(dir).unwrap();
+    }
+    #[test] fn single_book_export_has_own_format(){
+        let payload=single_book_export_payload(sample_book("a","Mi libro")).unwrap();
+        assert_eq!(payload.get("format").and_then(Value::as_str),Some("MARGEN_BOOK"));
+        assert_eq!(payload.get("formatVersion").and_then(Value::as_i64),Some(1));
+        assert_eq!(payload.get("book").and_then(|b|b.get("id")).and_then(Value::as_str),Some("a"));
+        assert_eq!(export_stem("Mi: libro?","Libro"),"Mi libro");
     }
     #[test] fn rotate_backups(){
         let dir=std::env::temp_dir().join(format!("margen-auto-{}",Uuid::new_v4()));

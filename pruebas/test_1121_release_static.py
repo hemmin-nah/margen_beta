@@ -17,11 +17,11 @@ editor_js=read('frontend/assets/margen-112.js')
 editor_css=read('frontend/assets/margen-112.css')
 workflow=read('.github/workflows/build-windows.yml')
 
-assert pkg['version']=='1.12.3'
-assert conf['version']=='1.12.3'
-assert re.search(r'^version\s*=\s*"1\.12\.3"',cargo,re.M)
+version=pkg['version']
+assert conf['version']==version
+assert re.search(r'^version\s*=\s*"'+re.escape(version)+r'"',cargo,re.M)
 assert 'margen-121.css' in index and 'margen-121.js' in index
-assert '1.12.3' in index
+assert version in index
 
 # R3: dos filas horizontales, flecha única, nombre del libro persistente y sin Escritura amplia.
 for token in ['m112-toolstack','data-m112-toolbar-toggle','m112-book-name','m1431-wide-tab']:

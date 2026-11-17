@@ -7,9 +7,9 @@ conf=json.loads((root/'src-tauri/tauri.conf.json').read_text('utf8'))
 index=(root/'frontend/index.html').read_text('utf8')
 rust=(root/'src-tauri/src/lib.rs').read_text('utf8')
 workflow=(root/'.github/workflows/build-windows.yml').read_text('utf8')
-assert package['version']=='1.12.2'
-assert conf['version']=='1.12.2' and conf['identifier']=='com.margen.escritorio'
-assert 'margen-111.css' in index and 'margen-111.js' in index and 'margen-112.css' in index and 'margen-112.js' in index and '1.12.2' in index
+version=package['version']
+assert conf['version']==version and conf['identifier']=='com.margen.escritorio'
+assert 'margen-111.css' in index and 'margen-111.js' in index and 'margen-112.css' in index and 'margen-112.js' in index and version in index
 for name in ['schema_migrations','DB_SCHEMA_VERSION','desktop_startup_health','desktop_support_info','desktop_export_diagnostics','desktop_open_data_folder','desktop_log_error','session.lock']:
     assert name in rust,name
 for resource in ['english.sqlite3','spanish-synonyms.sqlite3','spanish-definitions-CC-BY-SA.sqlite3','SOURCE_MANIFEST.json']:

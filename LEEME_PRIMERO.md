@@ -1,6 +1,6 @@
-# MARGEN Desktop 1.13.0 · Beta — Proyecto Windows / Tauri
+# MARGEN Desktop 1.13.1 · Beta — Proyecto Windows / Tauri
 
-Esta versión parte de la Beta final 1.12.3 y mejora Pizarra y los atajos sin modificar la barra del editor ni el workflow de compilación que ya está validado.
+Esta versión parte de MARGEN 1.13.0 y añade exportación JSON por libro sin modificar la barra del editor ni el workflow de compilación ya validado.
 
 ## Compilar en GitHub Actions
 

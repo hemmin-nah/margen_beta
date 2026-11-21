@@ -1,4 +1,4 @@
-//! MARGEN 1.13.1 Beta: backend local de escritorio.
+//! MARGEN 1.13.2 Beta: backend local de escritorio.
 //! Persistencia SQLite incremental por libro, carga bajo demanda, recuperación transaccional y medios por SHA256.
 //! No expone acceso arbitrario al disco ni acepta rutas suministradas por la webview.
 mod lexicon;

@@ -71,7 +71,7 @@ assert 'run: npm install' in workflow
 assert '@tauri-apps/cli@2.10.4' not in workflow
 assert '@tauri-apps/cli@2.12.4' not in workflow
 assert '$max = 3' in workflow and 'npm run tauri build -- --bundles nsis' in workflow
-assert 'MARGEN-1.12.1-Windows-x64' in workflow
+assert f'MARGEN-{version}-Windows-x64' in workflow
 assert 'python pruebas/test_1121_release_static.py' in workflow
 
 print('PASS 1.12.1 R3 release static')

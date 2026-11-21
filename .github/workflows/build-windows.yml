@@ -46,8 +46,14 @@ jobs:
       - name: Verificar código
         run: npm run check:frontend
 
-      - name: Verificar beta 1.12.1 sin navegador
+      - name: Verificar versión anterior y compatibilidad de UI
         run: python pruebas/test_1121_release_static.py
+
+      - name: Verificar exportación de libro 1.13.1
+        run: python pruebas/test_1131_single_book_export.py
+
+      - name: Verificar integridad de 1.13.2
+        run: python pruebas/test_1132_release_static.py
 
       - name: Pruebas Rust
         run: cargo test --manifest-path src-tauri/Cargo.toml
@@ -69,7 +75,7 @@ jobs:
       - name: Publicar fuentes y licencias comprobadas
         uses: actions/upload-artifact@v4
         with:
-          name: MARGEN-1.12.1-Fuentes-y-Licencias
+          name: MARGEN-1.13.2-Fuentes-y-Licencias
           path: |
             src-tauri/resources/LEGAL_LEXICONS.txt
             src-tauri/resources/lexicons/SOURCE_MANIFEST.json
@@ -79,13 +85,13 @@ jobs:
       - name: Publicar instalador como artefacto privado del workflow
         uses: actions/upload-artifact@v4
         with:
-          name: MARGEN-1.12.1-Windows-x64
+          name: MARGEN-1.13.2-Windows-x64
           path: src-tauri/target/release/bundle/nsis/*-setup.exe
           if-no-files-found: error
 
       - name: Publicar ejecutable (sin instalador)
         uses: actions/upload-artifact@v4
         with:
-          name: MARGEN-1.12.1-Ejecutable-x64
+          name: MARGEN-1.13.2-Ejecutable-x64
           path: src-tauri/target/release/margen-desktop.exe
           if-no-files-found: error

@@ -1,0 +1,5 @@
+/* MARGEN 1.13.2 — el marco sólo aparece al arrastrar sobre el fondo. */
+.board-viewport.m113-select-mode{user-select:none}
+.board-viewport .m1132-marquee{position:absolute;z-index:15;pointer-events:none;border:1px dashed var(--accent-strong);background:color-mix(in srgb,var(--accent) 11%,transparent)}
+.board-viewport .m113-stroke-hit.selected{stroke:color-mix(in srgb,var(--accent-strong) 55%,transparent)}
+.board-viewport .board-item .item-body[contenteditable="true"],.board-viewport .board-item input{user-select:text}

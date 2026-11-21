@@ -30,6 +30,9 @@ jobs:
       - name: Comprobar transformador léxico sin red
         run: python herramientas_lexicas.py --test
 
+      - name: Verificar reintentos y fuente alternativa (sin red)
+        run: python pruebas/test_1132_lexicon_download.py
+
       - name: Descargar y preparar recursos léxicos con licencias
         run: python herramientas_lexicas.py --build
 

@@ -4,7 +4,7 @@ Three INDEPENDENT SQLite databases, preserving source licenses.
 The script fails CI if sources cannot be fetched or validated.
 """
 from __future__ import annotations
-import argparse, datetime, gzip, hashlib, io, json, pathlib, re, sqlite3, sys, tempfile, urllib.parse, urllib.request, zipfile
+import argparse, datetime, gzip, hashlib, io, json, pathlib, re, sqlite3, sys, tempfile, time, urllib.parse, urllib.request, urllib.error, zipfile
 from collections import defaultdict
 
 ROOT=pathlib.Path(__file__).resolve().parent
@@ -14,6 +14,12 @@ SRC={
  'spa': 'https://raw.githubusercontent.com/omwn/omw-data/main/wns/mcr/wn-data-spa.tab',
  'wik': 'https://kaikki.org/eswiktionary/raw-wiktextract-data.jsonl.gz',
 }
+# Mismo artefacto WNDB 2025, distribuido en el release oficial del proyecto.
+# La copia de GitHub sirve de respaldo si en-word.net devuelve 503/504.
+FALLBACKS={
+ 'en': ('https://github.com/globalwordnet/english-wordnet/releases/download/2025-edition/english-wordnet-2025.zip',),
+}
+TRANSIENT_HTTP_CODES={408,429,500,502,503,504}
 SPANISH_BLOB_SHA='86c9e367d64a794300b414e55c78b54dbb07eb27'
 SCHEMA='''CREATE TABLE entries (key TEXT NOT NULL, lemma TEXT NOT NULL, pos TEXT NOT NULL, gloss TEXT NOT NULL, synset TEXT NOT NULL, synonyms TEXT NOT NULL, url TEXT NOT NULL);
 CREATE INDEX idx_entries_key ON entries(key);'''
@@ -102,17 +108,45 @@ def build_wiktionary(raw_gz:bytes,path:pathlib.Path,min_expected=10000):
  if entries<min_expected:raise ValueError(f'Extracción insuficiente de Wikcionario: {entries} acepciones')
  return {'pages':pages,'definitions':entries}
 
-def download(url):
- req=urllib.request.Request(url,headers={'User-Agent':'MARGEN-lexicon-build/1.10.1 (offline lexical resource packaging; authors acknowledged)','Accept':'application/octet-stream,*/*'})
- with urllib.request.urlopen(req,timeout=150) as resp:
-  return resp.read()
+def download(url, fallback_urls=(), attempts=3):
+ """Devuelve (bytes, URL efectiva). Reintenta fallos transitorios y usa respaldo oficial.
+
+ No ignora errores persistentes: el build seguirá fallando antes de empaquetar
+ un diccionario ausente, y se mantiene la validación existente de los datos.
+ """
+ last_error=None
+ for source_url in (url,*fallback_urls):
+  for attempt in range(1,attempts+1):
+   req=urllib.request.Request(source_url,headers={
+    'User-Agent':'MARGEN-lexicon-build/1.10.1 (offline lexical resource packaging; authors acknowledged)',
+    'Accept':'application/octet-stream,*/*',
+   })
+   try:
+    with urllib.request.urlopen(req,timeout=150) as resp:
+     blob=resp.read()
+    if not blob:raise OSError('La descarga devolvió un archivo vacío')
+    return blob,source_url
+   except (urllib.error.URLError,TimeoutError,OSError) as exc:
+    last_error=exc
+    transient=not isinstance(exc,urllib.error.HTTPError) or exc.code in TRANSIENT_HTTP_CODES
+    print(f'AVISO: descarga fallida ({attempt}/{attempts}) de {source_url}: {exc}',flush=True)
+    if transient and attempt<attempts:
+     wait=4*attempt
+     print(f'Reintentando dentro de {wait} s...',flush=True)
+     time.sleep(wait)
+    else:
+     break
+  if source_url!= (url,*fallback_urls)[-1]:
+   print('Probando fuente oficial alternativa...',flush=True)
+ raise RuntimeError(f'No se pudo descargar el recurso desde ninguna fuente: {url}') from last_error
 
 def run_build():
  OUT.mkdir(parents=True,exist_ok=True)
  results={};sources={};now=datetime.datetime.now(datetime.timezone.utc).isoformat()
  for name in ('en','spa','wik'):
   print('Recuperando fuente oficial:',name,SRC[name],flush=True)
-  raw=download(SRC[name]);sources[name]={'url':SRC[name],'downloadedAt':now,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
+  raw,used_url=download(SRC[name],FALLBACKS.get(name,()))
+  sources[name]={'url':used_url,'primaryUrl':SRC[name],'downloadedAt':now,'bytes':len(raw),'sha256':hashlib.sha256(raw).hexdigest()}
   if name=='en':results['en']=build_english(raw,OUT/'english.sqlite3')
   if name=='spa':results['spa']=build_spanish(raw,OUT/'spanish-synonyms.sqlite3')
   if name=='wik':results['wik']=build_wiktionary(raw,OUT/'spanish-definitions-CC-BY-SA.sqlite3')
@@ -128,10 +162,10 @@ def run_build():
  license_dir=ROOT/'src-tauri'/'resources'/'licenses';license_dir.mkdir(parents=True,exist_ok=True)
  license_provenance={}
  for filename,url in licenses.items():
-  blob=download(url)
+  blob,used_url=download(url)
   if len(blob)<300:raise ValueError(f'Licencia inesperadamente breve o no disponible: {filename}')
   (license_dir/filename).write_bytes(blob)
-  license_provenance[filename]={'url':url,'sha256':hashlib.sha256(blob).hexdigest()}
+  license_provenance[filename]={'url':used_url,'sha256':hashlib.sha256(blob).hexdigest()}
  manifest={'version':'1.10.1' ,'sources':sources,'licenses':license_provenance,'counts':results,'transformations':{'en':'WNDB → SQLite por acepción y sinónimos, sin imágenes','spa':'OMW Spanish MCR 3.0 → SQLite por conjunto semántico','wik':'Wiktextract de Wikcionario ES → SQLite; solo glosses, sin ejemplos/medios/etimologías'}}
  (OUT/'SOURCE_MANIFEST.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
  print(json.dumps(results,indent=2,ensure_ascii=False))
